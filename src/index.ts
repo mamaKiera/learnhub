@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import express from "express";
 import { createClient } from "redis";
+import cors from "cors";
 
 import { newRepositoryUser } from "./repositories/user";
 
@@ -36,6 +37,7 @@ async function main() {
   const contentRouter = express.Router();
 
   server.use(express.json());
+  server.use(cors()); //integrate with front end
   server.use("/auth", authRouter);
   server.use("/user", userRouter);
   server.use("/content", contentRouter);

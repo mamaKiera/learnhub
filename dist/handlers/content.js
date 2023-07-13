@@ -42,7 +42,10 @@ class HandlerContent {
     async getContents(req, res) {
         return this.repo
             .getContents()
-            .then((contents) => res.status(200).json(contents))
+            .then((contents) => {
+            console.log({ data: contents });
+            return res.status(200).json({ data: contents });
+        })
             .catch((err) => {
             console.error(`failed to create post: ${err}`);
             return res.status(500).json({ error: `failed to get posts` }).end();

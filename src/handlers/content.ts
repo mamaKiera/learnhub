@@ -2,6 +2,7 @@ import { Response } from "express";
 import { JwtAuthRequest } from "../auth/jwt";
 import { IRepositoryContent } from "../repositories";
 import { getVideoContent } from "../lib/util";
+import { toIContentDto, toIContentDtos } from "../entities";
 
 export interface IHandlerContent {
   createContent(req: JwtAuthRequest, res: Response): Promise<Response>;
@@ -47,7 +48,7 @@ class HandlerContent implements IHandlerContent {
         creatorUrl,
         thumbnailUrl,
       })
-      .then((content) => res.status(201).json(content).end())
+      .then((content) => res.status(201).json({data: toIContentDto(content)}).end())
       .catch((err) => {
         console.error(`failed to create todo: ${err}`);
         return res.status(500).json({ error: `failed to create post` }).end();
@@ -58,7 +59,10 @@ class HandlerContent implements IHandlerContent {
   async getContents(req: JwtAuthRequest, res: Response): Promise<Response> {
     return this.repo
       .getContents()
-      .then((contents) => res.status(200).json(contents))
+      .then((contents) =>{
+        const contentDto = toIContentDtos(contents)
+        return res.status(200).json({data: contentDto })
+      } )
       .catch((err) => {
         console.error(`failed to create post: ${err}`);
         return res.status(500).json({ error: `failed to get posts` }).end();
@@ -84,7 +88,9 @@ class HandlerContent implements IHandlerContent {
             .end();
         }
 
-        return res.status(200).json(content).end();
+        const contentDto = toIContentDto(content)
+        console.log(contentDto)
+        return res.status(200).json({data: contentDto}).end();
       })
       .catch((err) => {
         const errMsg = `failed to get post ${id}: ${err}`;

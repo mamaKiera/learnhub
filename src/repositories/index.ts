@@ -1,4 +1,4 @@
-import { IContent, ICreateContent } from "../entities";
+import { IContent, IContentWithUser, ICreateContent } from "../entities";
 
 export interface IRepositoryBlacklist {
   addToBlacklist(token: string): Promise<void>;
@@ -6,13 +6,13 @@ export interface IRepositoryBlacklist {
 }
 
 export interface IRepositoryContent {
-  createContent(content: ICreateContent): Promise<IContent>;
-  getContents(): Promise<IContent[]>;
-  getContentById(id: number): Promise<IContent | null>;
+  createContent(content: ICreateContent): Promise<IContentWithUser>;
+  getContents(): Promise<IContentWithUser[]>;
+  getContentById(id: number): Promise<IContentWithUser | null>;
   updateContent(arg: {
     id: number;
     comment: string;
     rating: number;
-  }): Promise<IContent>;
-  deleteContentById(arg: { id: number; userId: string }): Promise<IContent>;
+  }): Promise<IContentWithUser>;
+  deleteContentById(arg: { id: number; userId: string }): Promise<IContentWithUser>;
 }

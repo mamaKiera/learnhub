@@ -1,9 +1,22 @@
 import { PrismaClient } from "@prisma/client";
-import { ICreateContent, IContent } from "../entities";
+import { ICreateContent, IContentWithUser } from "../entities";
 import { IRepositoryContent } from ".";
 
 export function newRepositoryContent(db: PrismaClient): IRepositoryContent {
   return new RepositoryContent(db);
+}
+
+const includeUser = {
+  user: {
+    select: {
+      id: true,
+      username: true,
+      name: true,
+      password: false,
+      registeredAt: true,
+    }
+    
+  }
 }
 
 class RepositoryContent implements IRepositoryContent {
@@ -14,20 +27,9 @@ class RepositoryContent implements IRepositoryContent {
   }
 
   //create post
-  async createContent(content: ICreateContent): Promise<IContent> {
+  async createContent(content: ICreateContent): Promise<IContentWithUser> {
     return await this.db.content.create({
-      include: {
-        //select items to display here from user table
-        user: {
-          select: {
-            id: true,
-            name: true,
-            username: true,
-            registeredAt: true,
-            password: false,
-          },
-        },
-      },
+      include: includeUser,
       data: {
         ...content,
         userId: undefined, //set userId as undefined first in case there is a random userId sent in with content
@@ -41,13 +43,16 @@ class RepositoryContent implements IRepositoryContent {
   }
 
   //get all posts
-  async getContents(): Promise<IContent[]> {
-    return await this.db.content.findMany();
+  async getContents(): Promise<IContentWithUser[]> {
+    return await this.db.content.findMany({      
+      include: includeUser
+    });
   }
 
   //get 1 post by id
-  async getContentById(id: number): Promise<IContent | null> {
+  async getContentById(id: number): Promise<IContentWithUser | null> {
     return await this.db.content.findUnique({
+      include: includeUser,
       where: { id },
     });
   }
@@ -57,8 +62,9 @@ class RepositoryContent implements IRepositoryContent {
     id: number;
     comment: string;
     rating: number;
-  }): Promise<IContent> {
+  }): Promise<IContentWithUser> {
     return await this.db.content.update({
+      include: includeUser,
       where: { id: arg.id },
       data: {
         comment: arg.comment,
@@ -71,8 +77,9 @@ class RepositoryContent implements IRepositoryContent {
   async deleteContentById(arg: {
     id: number;
     userId: string;
-  }): Promise<IContent> {
+  }): Promise<IContentWithUser> {
     const content = await this.db.content.findFirst({
+      include: includeUser,
       where: { id: arg.id, userId: arg.userId },
     });
 
@@ -80,6 +87,6 @@ class RepositoryContent implements IRepositoryContent {
       return Promise.reject(`no such content: ${arg.id}`);
     }
 
-    return await this.db.content.delete({ where: { id: arg.id } });
+    return await this.db.content.delete({ include: includeUser, where: { id: arg.id } });
   }
 }

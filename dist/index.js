@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 const express_1 = __importDefault(require("express"));
 const redis_1 = require("redis");
+const cors_1 = __importDefault(require("cors"));
 const user_1 = require("./repositories/user");
 const user_2 = require("./handlers/user");
 const blacklist_1 = require("./repositories/blacklist");
@@ -35,6 +36,7 @@ async function main() {
     const userRouter = express_1.default.Router();
     const contentRouter = express_1.default.Router();
     server.use(express_1.default.json());
+    server.use((0, cors_1.default)()); //integrate with front end
     server.use("/auth", authRouter);
     server.use("/user", userRouter);
     server.use("/content", contentRouter);

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.newHandlerUser = void 0;
 const becrypt_1 = require("../auth/becrypt");
+const jwt_1 = require("../auth/jwt");
 function newHandlerUser(repo, repoBlacklist) {
     return new HandlerUser(repo, repoBlacklist);
 }
@@ -44,9 +45,10 @@ class HandlerUser {
             if (!(0, becrypt_1.compareHash)(password, user.password)) {
                 return res.status(401).json({ error: "invalid password" }).end();
             }
+            const accessToken = (0, jwt_1.newJwt)({ username, id: user.id });
             return res
                 .status(200)
-                .json({ status: "You have logged in", accessToken: req.token })
+                .json({ status: "You have logged in", accessToken })
                 .end();
         })
             .catch((err) => {

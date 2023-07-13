@@ -27,3 +27,19 @@ export interface IContent extends ICreateContent {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface IContentWithUser extends IContent {
+  user: IUserDto;
+}
+
+export interface IContentDto extends IContent {
+  postedBy: IUserDto
+}
+
+export function toIContentDto(content: IContentWithUser): IContentDto {
+  return {...content, postedBy: content.user}
+}
+
+export function toIContentDtos(contents: IContentWithUser[]): IContentDto[] {
+  return contents.map(content => toIContentDto(content))
+}

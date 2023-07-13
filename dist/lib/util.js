@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getVideoContent = void 0;
 async function getVideoContent(videoUrl) {
-    const res = await fetch(`iframe.ly/api/oembed?url=${videoUrl}&api_key=${process.env.IFRAMELY_API_KEY}`);
+    const res = await fetch(`https://iframe.ly/api/oembed?url=${videoUrl}&api_key=279a74be426f14f23421cc`);
     const content = await res.json();
     const { title, author, author_url, thumbnail_url } = content;
     return {
